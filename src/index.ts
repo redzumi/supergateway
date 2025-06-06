@@ -25,6 +25,7 @@ import { stdioToSse } from './gateways/stdioToSse.js'
 import { sseToStdio } from './gateways/sseToStdio.js'
 import { stdioToWs } from './gateways/stdioToWs.js'
 import { streamableHttpToStdio } from './gateways/streamableHttpToStdio.js'
+import { streamableHttpToSse } from './gateways/streamableHttpToSse.js'
 import { headers } from './lib/headers.js'
 import { corsOrigin } from './lib/corsOrigin.js'
 import { getLogger } from './lib/getLogger.js'
@@ -188,6 +189,21 @@ async function main() {
         await streamableHttpToStdio({
           streamableHttpUrl: argv.streamableHttp!,
           logger,
+          headers: headers({
+            argv,
+            logger,
+          }),
+        })
+      } else if (argv.outputTransport === 'sse') {
+        await streamableHttpToSse({
+          streamableHttpUrl: argv.streamableHttp!,
+          port: argv.port,
+          baseUrl: argv.baseUrl,
+          ssePath: argv.ssePath,
+          messagePath: argv.messagePath,
+          logger,
+          corsOrigin: corsOrigin({ argv }),
+          healthEndpoints: argv.healthEndpoint as string[],
           headers: headers({
             argv,
             logger,
